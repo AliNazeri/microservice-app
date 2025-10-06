@@ -1,0 +1,17 @@
+{
+  "name": "microservices-project",
+  "version": "1.0.0",
+  "scripts": {
+    "install-all": "npm install && npm run install-user && npm run install-email && npm run install-registry",
+    "install-user": "cd user-service && npm install",
+    "install-email": "cd email-service && npm install", 
+    "install-registry": "cd service-registry && npm install",
+    "dev": "concurrently \"npm run dev-user\" \"npm run dev-email\" \"npm run dev-registry\"",
+    "dev-user": "cd user-service && npm run dev",
+    "dev-email": "cd email-service && npm run dev",
+    "dev-registry": "cd service-registry && npm run dev"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
+}
