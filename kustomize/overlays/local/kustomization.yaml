@@ -8,14 +8,14 @@ resources:
  
 images: 
 - name: user-service 
-  newName: YOUR_DOCKER_USERNAME/user-service 
+  newName: sir0alien/user-service 
   newTag: latest 
 - name: email-service 
-  newName: YOUR_DOCKER_USERNAME/email-service 
+  newName: sir0alien/email-service 
   newTag: latest 
 - name: service-registry 
-  newName: YOUR_DOCKER_USERNAME/service-registry 
+  newName: sir0alien/service-registry 
   newTag: latest 
 - name: api-gateway 
-  newName: YOUR_DOCKER_USERNAME/api-gateway 
+  newName: sir0alien/api-gateway 
   newTag: latest 
