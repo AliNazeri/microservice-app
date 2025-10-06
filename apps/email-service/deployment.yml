@@ -15,13 +15,13 @@ spec:
       labels:
         app: email-service
     spec:
-      # initContainers:
-      # - name: wait-for-rabbitmq
-      #   image: busybox:1.28
-      #   command: ['sh', '-c', 'until nc -z rabbitmq 5672; do echo "Waiting for RabbitMQ..."; sleep 2; done; echo "RabbitMQ is ready"']
-      # - name: wait-for-service-registry
-      #   image: busybox:1.28
-      #   command: ['sh', '-c', 'until nc -z service-registry 8761; do echo "Waiting for Service Registry..."; sleep 2; done; echo "Service Registry is ready"']
+      initContainers:
+      - name: wait-for-rabbitmq
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nc -z rabbitmq 5672; do echo "Waiting for RabbitMQ..."; sleep 2; done; echo "RabbitMQ is ready"']
+      - name: wait-for-service-registry
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nc -z service-registry 8761; do echo "Waiting for Service Registry..."; sleep 2; done; echo "Service Registry is ready"']
       containers:
       - name: email-service
         image: email-service:latest

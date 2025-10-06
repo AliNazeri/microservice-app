@@ -16,12 +16,12 @@ spec:
         app: user-service
     spec:
       initContainers:
-      # - name: wait-for-mongodb
-      #   image: busybox:1.28
-      #   command: ['sh', '-c', 'until nc -z mongodb 27017; do echo "Waiting for MongoDB..."; sleep 2; done; echo "MongoDB is ready"']
-      # - name: wait-for-service-registry
-      #   image: busybox:1.28
-      #   command: ['sh', '-c', 'until nc -z service-registry 8761; do echo "Waiting for Service Registry..."; sleep 2; done; echo "Service Registry is ready"']
+      - name: wait-for-mongodb
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nc -z mongodb 27017; do echo "Waiting for MongoDB..."; sleep 2; done; echo "MongoDB is ready"']
+      - name: wait-for-service-registry
+        image: busybox:1.28
+        command: ['sh', '-c', 'until nc -z service-registry 8761; do echo "Waiting for Service Registry..."; sleep 2; done; echo "Service Registry is ready"']
       containers:
       - name: user-service
         image: user-service:latest
