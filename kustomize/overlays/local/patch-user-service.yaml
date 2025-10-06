@@ -1,0 +1,15 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+spec:
+  template:
+    spec:
+      containers:
+      - name: user-service
+        image: your-docker-username/user-service
+        env:
+        - name: MONGODB_URL
+          value: "mongodb://admin:password@mongodb:27017/userdb?authSource=admin"
+        - name: NODE_ENV
+          value: "production"

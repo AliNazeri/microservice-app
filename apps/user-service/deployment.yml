@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-service
+  namespace: microservices
+  labels:
+    app: user-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: user-service
+  template:
+    metadata:
+      labels:
+        app: user-service
+    spec:
+      initContainers:
+      # - name: wait-for-mongodb
+      #   image: busybox:1.28
+      #   command: ['sh', '-c', 'until nc -z mongodb 27017; do echo "Waiting for MongoDB..."; sleep 2; done; echo "MongoDB is ready"']
+      # - name: wait-for-service-registry
+      #   image: busybox:1.28
+      #   command: ['sh', '-c', 'until nc -z service-registry 8761; do echo "Waiting for Service Registry..."; sleep 2; done; echo "Service Registry is ready"']
+      containers:
+      - name: user-service
+        image: user-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        env:
+        - name: MONGODB_URL
+          value: "mongodb://admin:password@mongodb:27017/userdb?authSource=admin"
+        - name: SERVICE_REGISTRY_URL
+          value: "http://service-registry:8761"
+        - name: RABBITMQ_URL
+          value: "amqp://rabbitmq:5672"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 40  # Increased for init containers
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 15  # Increased for init containers
+          periodSeconds: 5
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-service
+  namespace: microservices
+spec:
+  selector:
+    app: user-service
+  ports:
+  - port: 8080
+    targetPort: 8080
+  type: ClusterIP

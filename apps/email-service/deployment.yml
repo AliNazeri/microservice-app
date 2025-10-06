@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: email-service
+  namespace: microservices
+  labels:
+    app: email-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: email-service
+  template:
+    metadata:
+      labels:
+        app: email-service
+    spec:
+      # initContainers:
+      # - name: wait-for-rabbitmq
+      #   image: busybox:1.28
+      #   command: ['sh', '-c', 'until nc -z rabbitmq 5672; do echo "Waiting for RabbitMQ..."; sleep 2; done; echo "RabbitMQ is ready"']
+      # - name: wait-for-service-registry
+      #   image: busybox:1.28
+      #   command: ['sh', '-c', 'until nc -z service-registry 8761; do echo "Waiting for Service Registry..."; sleep 2; done; echo "Service Registry is ready"']
+      containers:
+      - name: email-service
+        image: email-service:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8081
+        env:
+        - name: DATABASE_URL
+          value: "postgresql://admin:password@postgresql:5432/emaildb"
+        - name: SERVICE_REGISTRY_URL
+          value: "http://service-registry:8761"
+        - name: RABBITMQ_URL
+          value: "amqp://rabbitmq:5672"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8081
+          initialDelaySeconds: 40
+          periodSeconds: 10
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: email-service
+  namespace: microservices
+spec:
+  selector:
+    app: email-service
+  ports:
+  - port: 8081
+    targetPort: 8081
+  type: ClusterIP

@@ -1,0 +1,34 @@
+name: CD - GitOps Sync
+
+on:
+  workflow_dispatch:  # Manual trigger
+  push:
+    branches: [ main ]
+    paths:
+      - 'apps/**'
+      - 'kustomize/**'
+      - 'infrastructure/**'
+
+jobs:
+  update-gitops:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Update Kustomize images
+      run: |
+        cd kustomize/overlays/local
+        kustomize edit set image user-service=${{ secrets.DOCKER_USERNAME }}/user-service:latest
+        kustomize edit set image email-service=${{ secrets.DOCKER_USERNAME }}/email-service:latest
+        kustomize edit set image service-registry=${{ secrets.DOCKER_USERNAME }}/service-registry:latest
+        kustomize edit set image api-gateway=${{ secrets.DOCKER_USERNAME }}/api-gateway:latest
+
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add kustomize/overlays/local/kustomization.yaml
+        git commit -m "CI: Update image tags to latest"
+        git push
